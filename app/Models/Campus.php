@@ -17,6 +17,8 @@ class Campus extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'campus_id';
+
     /**
      * The attributes that are mass assignable.
      *

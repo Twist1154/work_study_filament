@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('bank_name', 100);
             $table->string('branch_name', 100)->nullable();
             $table->string('branch_code', 20)->nullable();
-            $table->string('ownership_type', 20);
+            $table->enum('ownership_type', ['own', 'third_party'])->default('own');
             $table->string('third_party_name', 200)->nullable();
             $table->string('third_party_relationship', 100)->nullable();
             $table->date('valid_from');

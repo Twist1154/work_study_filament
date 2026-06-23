@@ -14,10 +14,10 @@ class DepartmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'department_id' => Department::factory(),
-            'department_name' => fake()->regexify('[A-Za-z0-9]{100}'),
+            'department_id' => fake()->unique()->randomNumber(5),
+            'department_name' => fake()->jobTitle() . ' Department',
             'campus_id' => Campus::factory(),
-            'contact_details' => fake()->word(),
+            'contact_details' => fake()->phoneNumber(),
         ];
     }
 }

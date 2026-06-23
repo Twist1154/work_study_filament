@@ -13,9 +13,9 @@ class CampusFactory extends Factory
     public function definition(): array
     {
         return [
-            'campus_id' => Campus::factory(),
-            'campus_name' => fake()->regexify('[A-Za-z0-9]{100}'),
-            'address' => fake()->word(),
+            'campus_id' => fake()->unique()->randomNumber(5),
+            'campus_name' => fake()->company() . ' Campus',
+            'address' => fake()->address(),
         ];
     }
 }

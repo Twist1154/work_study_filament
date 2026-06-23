@@ -17,6 +17,8 @@ class Student extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'student_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -24,7 +26,7 @@ class Student extends Model
      */
     protected $fillable = [
         'student_id',
-        'authentication_id',
+        'user_id',
         'student_number',
         'surname',
         'first_names',
@@ -51,7 +53,7 @@ class Student extends Model
         return [
             'id' => 'integer',
             'student_id' => 'integer',
-            'authentication_id' => 'integer',
+            'user_id' => 'integer',
             'date_of_birth' => 'date',
             'is_foreign_student' => 'boolean',
             'work_permit_expiry' => 'date',
@@ -63,8 +65,8 @@ class Student extends Model
     }
 
 
-    public function authentication(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Authentication::class, 'authentication_id', 'authentication_id');
+        return $this->belongsTo(User::class);
     }
 }

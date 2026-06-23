@@ -13,10 +13,10 @@ class JobCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'job_category_id' => JobCategory::factory(),
-            'category_name' => fake()->regexify('[A-Za-z0-9]{100}'),
-            'max_hours_per_month' => fake()->numberBetween(-10000, 10000),
-            'description' => fake()->text(),
+            'job_category_id' => fake()->unique()->randomNumber(5),
+            'category_name' => fake()->jobTitle(),
+            'max_hours_per_month' => fake()->numberBetween(10, 40),
+            'description' => fake()->sentence(),
         ];
     }
 }

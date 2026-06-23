@@ -21,12 +21,16 @@ models:
 
   User:
     id: id
+    name: string:255
     email: string:255 unique
+    email_verified_at: timestamp nullable
     password: string:255
     is_locked: boolean default:false
+    remember_token: string:100 nullable
     timestamps: true
 
   StaffMember:
+    id: id
     staff_id: id
     user_id: id foreign:users.id onDelete:cascade unique
     staff_number: string:50 nullable
@@ -36,6 +40,7 @@ models:
     timestamps: false
 
   Student:
+    id: id
     student_id: id
     user_id: id foreign:users.id onDelete:cascade unique
     student_number: string:50 nullable
@@ -57,6 +62,7 @@ models:
   Address:
     meta:
       table: address
+    id: id
     address_id: id
     student_id: id foreign:students.student_id onDelete:cascade index
     street_number: integer nullable
@@ -67,6 +73,7 @@ models:
     timestamps: false
 
   Invitation:
+    id: id
     invitation_id: id
     invitation_token: string:64 unique
     job_category_id: id foreign:job_categories.job_category_id
@@ -81,6 +88,7 @@ models:
     timestamps: false
 
   Registration:
+    id: id
     registration_id: id
     invitation_id: id foreign:invitations.invitation_id unique index
     student_id: id foreign:students.student_id index
@@ -97,6 +105,7 @@ models:
     timestamps: false
 
   BankDetail:
+    id: id
     bank_detail_id: id
     student_id: id foreign:students.student_id onDelete:cascade index
     account_type: string:30
@@ -111,6 +120,7 @@ models:
     timestamps: false
 
   TaxDeclaration:
+    id: id
     declaration_id: id
     student_id: id foreign:students.student_id onDelete:cascade index
     works_less_than_22hrs: boolean default:true
@@ -122,6 +132,7 @@ models:
     timestamps: false
 
   WorkstudyTerm:
+    id: id
     terms_id: id
     student_id: id foreign:students.student_id onDelete:cascade index
     supervisor_id: id foreign:staff_members.staff_id nullable
@@ -135,6 +146,7 @@ models:
     timestamps: false
 
   Qualification:
+    id: id
     qualification_id: id
     student_id: id foreign:students.student_id onDelete:cascade index
     qualification_name: string:200
@@ -142,6 +154,7 @@ models:
     timestamps: false
 
   Appointment:
+    id: id
     appointment_id: id
     student_id: id foreign:students.student_id index
     job_category_id: id foreign:job_categories.job_category_id
@@ -158,6 +171,7 @@ models:
     timestamps: false
 
   Claim:
+    id: id
     claim_id: id
     appointment_id: id foreign:appointments.appointment_id index
     student_id: id foreign:students.student_id index
@@ -177,6 +191,7 @@ models:
       - unique: appointment_id, claim_month, claim_year
 
   Document:
+    id: id
     document_id: id
     student_id: id foreign:students.student_id nullable index
     registration_id: id foreign:registrations.registration_id nullable index
@@ -188,6 +203,7 @@ models:
     timestamps: false
 
   Notification:
+    id: id
     notification_id: id
     recipient_email: string:255
     student_id: id foreign:students.student_id nullable index

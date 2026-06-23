@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('campuses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('campus_id');
+            $table->unsignedBigInteger('campus_id')->unique();
             $table->string('campus_name', 100);
             $table->string('address')->nullable();
         });

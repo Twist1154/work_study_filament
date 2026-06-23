@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::create('workstudy_terms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('terms_id');
+            $table->unsignedBigInteger('terms_id')->unique();
             $table->foreignId('student_id')->constrained('students', 'student_id')->cascadeOnDelete()->index();
             $table->foreignId('supervisor_id')->nullable()->constrained('staff_members', 'staff_id');
             $table->string('student_signature_file', 500)->nullable();

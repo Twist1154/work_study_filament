@@ -17,6 +17,8 @@ class Registration extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'registration_id';
+
     /**
      * The attributes that are mass assignable.
      *

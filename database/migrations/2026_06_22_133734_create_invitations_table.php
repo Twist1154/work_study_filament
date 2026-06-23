@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invitation_id');
+            $table->unsignedBigInteger('invitation_id')->unique();
             $table->string('invitation_token', 64)->unique();
             $table->foreignId('job_category_id')->constrained('job_categories', 'job_category_id');
             $table->foreignId('department_id')->constrained('departments', 'department_id');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('surname', 100)->nullable();
             $table->string('cost_centre', 20)->default('Y269');
             $table->dateTime('expires_at');
-            $table->string('status', 30)->default('sent');
+            $table->enum('status', ['sent', 'expired', 'accepted', 'cancelled'])->default('sent');
         });
 
         Schema::enableForeignKeyConstraints();

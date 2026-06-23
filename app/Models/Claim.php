@@ -17,6 +17,8 @@ class Claim extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'claim_id';
+
     /**
      * The attributes that are mass assignable.
      *

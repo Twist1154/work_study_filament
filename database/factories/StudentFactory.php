@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Authentication;
+use App\Models\User;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,18 +14,18 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'student_id' => Student::factory(),
-            'authentication_id' => Authentication::factory(),
-            'student_number' => fake()->regexify('[A-Za-z0-9]{50}'),
-            'surname' => fake()->regexify('[A-Za-z0-9]{100}'),
-            'first_names' => fake()->regexify('[A-Za-z0-9]{200}'),
-            'gender' => fake()->regexify('[A-Za-z0-9]{20}'),
-            'date_of_birth' => fake()->date(),
-            'id_passport_number' => fake()->regexify('[A-Za-z0-9]{50}'),
-            'sars_tax_number' => fake()->regexify('[A-Za-z0-9]{20}'),
-            'is_foreign_student' => fake()->boolean(),
-            'work_permit_number' => fake()->regexify('[A-Za-z0-9]{50}'),
-            'work_permit_expiry' => fake()->date(),
+            'student_id' => fake()->unique()->randomNumber(5),
+            'user_id' => User::factory(),
+            'student_number' => 'STU' . fake()->unique()->numberBetween(100000, 999999),
+            'surname' => fake()->lastName(),
+            'first_names' => fake()->firstName() . ' ' . fake()->firstName(),
+            'gender' => fake()->randomElement(['Male', 'Female', 'Other']),
+            'date_of_birth' => fake()->date('Y-m-d', '-18 years'),
+            'id_passport_number' => fake()->numerify('#############'),
+            'sars_tax_number' => fake()->numerify('##########'),
+            'is_foreign_student' => false,
+            'work_permit_number' => null,
+            'work_permit_expiry' => null,
             'fee_account_outstanding' => fake()->boolean(),
             'nsfas_funded' => fake()->boolean(),
             'full_bursary_holder' => fake()->boolean(),

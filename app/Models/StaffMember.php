@@ -17,6 +17,8 @@ class StaffMember extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'staff_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -24,7 +26,7 @@ class StaffMember extends Model
      */
     protected $fillable = [
         'staff_id',
-        'authentication_id',
+        'user_id',
         'staff_number',
         'full_name',
         'role',
@@ -41,15 +43,15 @@ class StaffMember extends Model
         return [
             'id' => 'integer',
             'staff_id' => 'integer',
-            'authentication_id' => 'integer',
+            'user_id' => 'integer',
             'department_id' => 'integer',
         ];
     }
 
 
-    public function authentication(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Authentication::class, 'authentication_id', 'authentication_id');
+        return $this->belongsTo(User::class);
     }
 
     public function department(): BelongsTo

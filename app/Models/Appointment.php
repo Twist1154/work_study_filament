@@ -17,6 +17,8 @@ class Appointment extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'appointment_id';
+
     /**
      * The attributes that are mass assignable.
      *

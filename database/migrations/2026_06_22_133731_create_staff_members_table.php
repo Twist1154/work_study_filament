@@ -15,8 +15,8 @@ return new class extends Migration
 
         Schema::create('staff_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('staff_id');
-            $table->foreignId('authentication_id')->constrained('authentication', 'authentication_id')->cascadeOnDelete()->unique();
+            $table->unsignedBigInteger('staff_id')->unique();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->unique();
             $table->string('staff_number', 50)->nullable();
             $table->string('full_name', 150);
             $table->string('role', 50);

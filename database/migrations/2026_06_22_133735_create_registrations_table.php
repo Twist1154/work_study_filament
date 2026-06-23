@@ -15,10 +15,10 @@ return new class extends Migration
 
         Schema::create('registrations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id');
-            $table->foreignId('invitation_id')->constrained('invitations', 'invitation_id')->unique()->index();
-            $table->foreignId('student_id')->constrained('students', 'student_id')->index();
-            $table->string('status', 30)->default('pending_student');
+            $table->unsignedBigInteger('registration_id')->unique();
+            $table->foreignId('invitation_id')->constrained('invitations', 'invitation_id')->unique();
+            $table->foreignId('student_id')->constrained('students', 'student_id');
+            $table->enum('status', ['pending_student', 'pending_verification', 'pending_hod_approval', 'pending_final', 'approved', 'rejected'])->default('pending_student');
             $table->boolean('conditions_accepted')->default(false);
             $table->foreignId('verifier_id')->nullable()->constrained('staff_members', 'staff_id');
             $table->foreignId('hod_approver_id')->nullable()->constrained('staff_members', 'staff_id');

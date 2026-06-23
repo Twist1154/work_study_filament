@@ -16,6 +16,12 @@ class Setting extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'key';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     /**
      * The attributes that are mass assignable.
      *

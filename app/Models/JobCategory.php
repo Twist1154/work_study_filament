@@ -17,6 +17,8 @@ class JobCategory extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'job_category_id';
+
     /**
      * The attributes that are mass assignable.
      *

@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('department_id');
+            $table->unsignedBigInteger('department_id')->unique();
             $table->string('department_name', 100);
             $table->foreignId('campus_id')->constrained('campuses', 'campus_id')->index();
             $table->string('contact_details')->nullable();

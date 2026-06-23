@@ -1,0 +1,203 @@
+models:
+  Campus:
+    campus_id: id
+    campus_name: string:100
+    address: string nullable
+    timestamps: false
+
+  Department:
+    department_id: id
+    department_name: string:100
+    campus_id: id foreign:campuses.campus_id index
+    contact_details: string nullable
+    timestamps: false
+
+  JobCategory:
+    job_category_id: id
+    category_name: string:100
+    max_hours_per_month: integer
+    description: string nullable
+    timestamps: false
+
+  User:
+    id: id
+    email: string:255 unique
+    password: string:255
+    is_locked: boolean default:false
+    timestamps: true
+
+  StaffMember:
+    staff_id: id
+    user_id: id foreign:users.id onDelete:cascade unique
+    staff_number: string:50 nullable
+    full_name: string:150
+    role: string:50
+    department_id: id foreign:departments.department_id onDelete:null nullable index
+    timestamps: false
+
+  Student:
+    student_id: id
+    user_id: id foreign:users.id onDelete:cascade unique
+    student_number: string:50 nullable
+    surname: string:100
+    first_names: string:200
+    gender: string:20 nullable
+    date_of_birth: date nullable
+    id_passport_number: string:50 nullable
+    sars_tax_number: string:20 nullable
+    is_foreign_student: boolean default:false
+    work_permit_number: string:50 nullable
+    work_permit_expiry: date nullable
+    fee_account_outstanding: boolean default:true
+    nsfas_funded: boolean default:false
+    full_bursary_holder: boolean default:false
+    bursary_settled_before_sem2: boolean default:false
+    timestamps: false
+
+  Address:
+    meta:
+      table: address
+    address_id: id
+    student_id: id foreign:students.student_id onDelete:cascade index
+    street_number: integer nullable
+    street_name: string:150 nullable
+    suburb: string:100 nullable
+    city: string:100 nullable
+    post_code: string:20 nullable
+    timestamps: false
+
+  Invitation:
+    invitation_id: id
+    invitation_token: string:64 unique
+    job_category_id: id foreign:job_categories.job_category_id
+    department_id: id foreign:departments.department_id
+    campus_id: id foreign:campuses.campus_id
+    supervisor_id: id foreign:staff_members.staff_id
+    first_names: string:200 nullable
+    surname: string:100 nullable
+    cost_centre: string:20 default:'Y269'
+    expires_at: dateTime
+    status: enum:sent,expired,accepted,cancelled default:sent
+    timestamps: false
+
+  Registration:
+    registration_id: id
+    invitation_id: id foreign:invitations.invitation_id unique index
+    student_id: id foreign:students.student_id index
+    status: enum:pending_student,pending_verification,pending_hod_approval,pending_final,approved,rejected default:pending_student
+    conditions_accepted: boolean default:false
+    verifier_id: id foreign:staff_members.staff_id nullable
+    hod_approver_id: id foreign:staff_members.staff_id nullable
+    final_approver_id: id foreign:staff_members.staff_id nullable
+    hod_signature_file: string:500 nullable
+    hod_signature_date: date nullable
+    hod_signature_place: string:200 nullable
+    claims_sheet_pdf_path: string:500 nullable
+    created_at: dateTime useCurrent
+    timestamps: false
+
+  BankDetail:
+    bank_detail_id: id
+    student_id: id foreign:students.student_id onDelete:cascade index
+    account_type: string:30
+    account_number: string:30
+    bank_name: string:100
+    branch_name: string:100 nullable
+    branch_code: string:20 nullable
+    ownership_type: enum:own,third_party default:own
+    third_party_name: string:200 nullable
+    third_party_relationship: string:100 nullable
+    valid_from: date
+    timestamps: false
+
+  TaxDeclaration:
+    declaration_id: id
+    student_id: id foreign:students.student_id onDelete:cascade index
+    works_less_than_22hrs: boolean default:true
+    no_other_employer: boolean default:true
+    declaration_text: text nullable
+    signed_place: string:200 nullable
+    declaration_date: date useCurrent
+    tax_rate_applied: decimal:5,4 default:0.0
+    timestamps: false
+
+  WorkstudyTerm:
+    terms_id: id
+    student_id: id foreign:students.student_id onDelete:cascade index
+    supervisor_id: id foreign:staff_members.staff_id nullable
+    student_signature_file: string:500 nullable
+    student_signed_date: date nullable
+    student_signed_place: string:200 nullable
+    supervisor_signature_file: string:500 nullable
+    supervisor_signed_date: date nullable
+    supervisor_signed_place: string:200 nullable
+    terms_accepted: boolean default:false
+    timestamps: false
+
+  Qualification:
+    qualification_id: id
+    student_id: id foreign:students.student_id onDelete:cascade index
+    qualification_name: string:200
+    year_obtained: integer nullable
+    timestamps: false
+
+  Appointment:
+    appointment_id: id
+    student_id: id foreign:students.student_id index
+    job_category_id: id foreign:job_categories.job_category_id
+    department_id: id foreign:departments.department_id
+    campus_id: id foreign:campuses.campus_id
+    supervisor_id: id foreign:staff_members.staff_id
+    registration_id: id foreign:registrations.registration_id unique index
+    commencement_date: date
+    termination_date: date nullable
+    remuneration_rate_per_hour: decimal:10,2
+    cost_centre: string:20 default:'Y269'
+    appointment_type: enum:New Appointment,Renewal
+    status: enum:active,completed,terminated default:active
+    timestamps: false
+
+  Claim:
+    claim_id: id
+    appointment_id: id foreign:appointments.appointment_id index
+    student_id: id foreign:students.student_id index
+    claim_month: integer
+    claim_year: integer
+    hours_worked: decimal:5,2
+    amount_claimed: decimal:10,2
+    amount_to_fees: decimal:10,2 default:0
+    amount_to_bank: decimal:10,2 default:0
+    approved_by_id: id foreign:staff_members.staff_id nullable
+    status: enum:submitted,supervisor_approved,coordinator_approved,paid default:submitted
+    is_late_claim: boolean default:false
+    locked_after_supervisor_approval: boolean default:false
+    tax_rate_applied: decimal:5,4 default:0.0
+    timestamps: false
+    indexes:
+      - unique: appointment_id, claim_month, claim_year
+
+  Document:
+    document_id: id
+    student_id: id foreign:students.student_id nullable index
+    registration_id: id foreign:registrations.registration_id nullable index
+    appointment_id: id foreign:appointments.appointment_id nullable index
+    document_type: enum:ID Copy,Proof of Registration,CV,Highest Qualification,SARS Tax Certificate,Tutor Training Certificate,Work Permit,Study Permit,Tax Declaration,Other
+    file_path: string:500
+    permit_expiry_date: date nullable
+    uploaded_at: dateTime useCurrent
+    timestamps: false
+
+  Notification:
+    notification_id: id
+    recipient_email: string:255
+    student_id: id foreign:students.student_id nullable index
+    type: string:50
+    sent_at: dateTime useCurrent
+    timestamps: false
+
+  Setting:
+    id: false
+    key: string:100 primary
+    value: string:255
+    description: string nullable
+    timestamps: false

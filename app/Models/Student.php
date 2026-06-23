@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Student extends Model
+{
+    use HasFactory;
+
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'student_id',
+        'authentication_id',
+        'student_number',
+        'surname',
+        'first_names',
+        'gender',
+        'date_of_birth',
+        'id_passport_number',
+        'sars_tax_number',
+        'is_foreign_student',
+        'work_permit_number',
+        'work_permit_expiry',
+        'fee_account_outstanding',
+        'nsfas_funded',
+        'full_bursary_holder',
+        'bursary_settled_before_sem2',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'id' => 'integer',
+            'student_id' => 'integer',
+            'authentication_id' => 'integer',
+            'date_of_birth' => 'date',
+            'is_foreign_student' => 'boolean',
+            'work_permit_expiry' => 'date',
+            'fee_account_outstanding' => 'boolean',
+            'nsfas_funded' => 'boolean',
+            'full_bursary_holder' => 'boolean',
+            'bursary_settled_before_sem2' => 'boolean',
+        ];
+    }
+
+
+    public function authentication(): BelongsTo
+    {
+        return $this->belongsTo(Authentication::class, 'authentication_id', 'authentication_id');
+    }
+}

@@ -40,7 +40,7 @@ models:
     timestamps: false
 
   Student:
-    id: id
+    id: id false
     student_id: id
     user_id: id foreign:users.id onDelete:cascade unique
     student_number: string:50 nullable

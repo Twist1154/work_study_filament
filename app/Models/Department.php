@@ -39,7 +39,6 @@ class Department extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'department_id' => 'integer',
             'campus_id' => 'integer',
         ];

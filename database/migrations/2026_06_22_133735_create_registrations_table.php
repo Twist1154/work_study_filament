@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('registrations', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('registration_id')->unique();
+            $table->id('registration_id');
             $table->foreignId('invitation_id')->constrained('invitations', 'invitation_id')->unique();
             $table->foreignId('student_id')->constrained('students', 'student_id');
             $table->enum('status', ['pending_student', 'pending_verification', 'pending_hod_approval', 'pending_final', 'approved', 'rejected'])->default('pending_student');

@@ -49,7 +49,6 @@ class Claim extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'claim_id' => 'integer',
             'appointment_id' => 'integer',
             'student_id' => 'integer',

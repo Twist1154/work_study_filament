@@ -47,7 +47,6 @@ class Registration extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'registration_id' => 'integer',
             'invitation_id' => 'integer',
             'student_id' => 'integer',

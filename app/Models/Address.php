@@ -24,6 +24,9 @@ class Address extends Model
      */
     public $timestamps = false;
 
+    // FIXED: Explicitly set the primary key for this model [1.1.2]
+    protected $primaryKey = 'address_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -47,7 +50,7 @@ class Address extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
+            // FIXED: Removed redundant id cast
             'address_id' => 'integer',
             'student_id' => 'integer',
         ];

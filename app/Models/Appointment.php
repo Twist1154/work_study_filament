@@ -48,7 +48,6 @@ class Appointment extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'appointment_id' => 'integer',
             'student_id' => 'integer',
             'job_category_id' => 'integer',

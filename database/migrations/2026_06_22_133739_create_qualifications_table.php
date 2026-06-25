@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('qualifications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('qualification_id');
+            $table->id('qualification_id');
             $table->foreignId('student_id')->constrained('students', 'student_id')->cascadeOnDelete()->index();
             $table->string('qualification_name', 200);
             $table->integer('year_obtained')->nullable();

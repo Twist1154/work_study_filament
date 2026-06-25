@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('bank_details', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('bank_detail_id');
+            $table->id('bank_detail_id');
             $table->foreignId('student_id')->constrained('students', 'student_id')->cascadeOnDelete()->index();
             $table->string('account_type', 30);
             $table->string('account_number', 30);

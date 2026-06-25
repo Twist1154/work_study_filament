@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('appointments', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('appointment_id')->unique();
+            $table->id('appointment_id');
             $table->foreignId('student_id')->constrained('students', 'student_id');
             $table->foreignId('job_category_id')->constrained('job_categories', 'job_category_id');
             $table->foreignId('department_id')->constrained('departments', 'department_id');

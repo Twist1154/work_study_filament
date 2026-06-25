@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('address', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('address_id');
+            // FIXED: Removed duplicate id() and set address_id as the primary key [1.1.2]
+            $table->id('address_id');
+
             $table->foreignId('student_id')->constrained('students', 'student_id')->cascadeOnDelete()->index();
             $table->integer('street_number')->nullable();
             $table->string('street_name', 150)->nullable();

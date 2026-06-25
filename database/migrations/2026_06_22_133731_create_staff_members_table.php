@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('staff_members', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('staff_id')->unique();
+            $table->id('staff_id');
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->unique();
             $table->string('staff_number', 50)->nullable();
             $table->string('full_name', 150);

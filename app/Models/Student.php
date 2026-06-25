@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Student extends Model
 {
@@ -17,6 +19,11 @@ class Student extends Model
      */
     public $timestamps = false;
 
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
     protected $primaryKey = 'student_id';
 
     /**
@@ -51,7 +58,6 @@ class Student extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'student_id' => 'integer',
             'user_id' => 'integer',
             'date_of_birth' => 'date',
@@ -64,9 +70,43 @@ class Student extends Model
         ];
     }
 
-
+    /**
+     * Relationship to the parent User.
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    /**
+     * Relationship to the Student's registered Addresses.
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class, 'student_id', 'student_id');
+    }
+
+    /**
+     * Relationship to the Student's Bank Details.
+     */
+    public function bankDetail(): HasOne
+    {
+        return $this->hasOne(BankDetail::class, 'student_id', 'student_id');
+}
+
+    /**
+     * Relationship to the Student's Workstudy Terms Agreements.
+     */
+    public function workstudyTerms(): HasMany
+    {
+        return $this->hasMany(WorkstudyTerm::class, 'student_id', 'student_id');
+    }
+
+    /**
+     * Relationship to the Student's Tax Declarations.
+     */
+    public function taxDeclarations(): HasMany
+    {
+        return $this->hasMany(TaxDeclaration::class, 'student_id', 'student_id');
     }
 }

@@ -17,6 +17,8 @@ class TaxDeclaration extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'declaration_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -41,7 +43,6 @@ class TaxDeclaration extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'declaration_id' => 'integer',
             'student_id' => 'integer',
             'works_less_than_22hrs' => 'boolean',

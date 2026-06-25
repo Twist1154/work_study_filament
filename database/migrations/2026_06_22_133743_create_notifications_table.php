@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('notification_id');
+            $table->id('notification_id');
             $table->string('recipient_email', 255);
             $table->foreignId('student_id')->nullable()->constrained('students', 'student_id')->index();
             $table->string('type', 50);

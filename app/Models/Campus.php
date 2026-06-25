@@ -38,7 +38,6 @@ class Campus extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'campus_id' => 'integer',
         ];
     }

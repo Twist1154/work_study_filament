@@ -17,6 +17,9 @@ class Notification extends Model
      */
     public $timestamps = false;
 
+    // FIXED: Explicitly set the primary key for the notifications model [1.1.2]
+    protected $primaryKey = 'notification_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -38,13 +41,11 @@ class Notification extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'notification_id' => 'integer',
             'student_id' => 'integer',
             'sent_at' => 'datetime',
         ];
     }
-
 
     public function student(): BelongsTo
     {

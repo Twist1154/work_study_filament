@@ -41,7 +41,6 @@ class StaffMember extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'staff_id' => 'integer',
             'user_id' => 'integer',
             'department_id' => 'integer',

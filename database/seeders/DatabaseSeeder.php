@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         JobCategory::factory(5)->create();
 
         // 4. Create Specific Test Users from DUMMY_CREDENTIALS.md
-        // Staff Accounts
+        // Staff Accounts (Access: Admin panel /app & Staff panel /staff) [1.1.3]
         $staffMembers = [
             ['name' => 'Admin User', 'email' => 'admin@university.ac.za', 'password' => 'Admin@123', 'role' => 'Admin'],
             ['name' => 'HOD User', 'email' => 'hod@university.ac.za', 'password' => 'HOD@123', 'role' => 'HOD'],
@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Coordinator User', 'email' => 'coord@university.ac.za', 'password' => 'Coord@123', 'role' => 'Coordinator'],
         ];
 
-        foreach ($staffMembers as $index => $staffData) {
+        foreach ($staffMembers as $staffData) {
             $user = User::factory()->create([
                 'name' => $staffData['name'],
                 'email' => $staffData['email'],
@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Student Accounts
+        // Student Accounts (Pre-registered, Access: Active student dashboard) [1.1.3]
         $students = [
             ['name' => 'Student One', 'email' => 'student1@university.ac.za', 'student_number' => 'ST001'],
             ['name' => 'Student Two', 'email' => 'student2@university.ac.za', 'student_number' => 'ST002'],
@@ -76,6 +76,13 @@ class DatabaseSeeder extends Seeder
                 'surname' => explode(' ', $studentData['name'])[1] ?? 'User',
             ]);
         }
+
+        // ADDED: Clean user with NO pre-seeded Student profile to test your registration wizard [2.1.3]
+        User::factory()->create([
+            'name' => 'New Applicant',
+            'email' => 'applicant@university.ac.za',
+            'password' => \Hash::make('Student@123'),
+        ]);
 
         // 5. Seed some random staff and students
         foreach ($departments as $dept) {

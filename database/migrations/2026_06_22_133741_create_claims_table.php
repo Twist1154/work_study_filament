@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('claims', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('claim_id')->unique();
+            $table->id('claim_id');
             $table->foreignId('appointment_id')->constrained('appointments', 'appointment_id');
             $table->foreignId('student_id')->constrained('students', 'student_id');
             $table->integer('claim_month');

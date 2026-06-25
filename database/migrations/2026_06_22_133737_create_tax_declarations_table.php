@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('tax_declarations', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('declaration_id');
+            $table->id('declaration_id');
             $table->foreignId('student_id')->constrained('students', 'student_id')->cascadeOnDelete()->index();
             $table->boolean('works_less_than_22hrs')->default(true);
             $table->boolean('no_other_employer')->default(true);

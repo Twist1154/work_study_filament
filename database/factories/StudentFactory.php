@@ -14,7 +14,7 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'student_id' => fake()->unique()->randomNumber(5),
+            'student_id' => fake()->unique()->randomNumber(5), // delete this this script fails since it's auto increment
             'user_id' => User::factory(),
             'student_number' => 'STU' . fake()->unique()->numberBetween(100000, 999999),
             'surname' => fake()->lastName(),

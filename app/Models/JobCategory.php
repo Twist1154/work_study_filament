@@ -39,7 +39,6 @@ class JobCategory extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'job_category_id' => 'integer',
         ];
     }

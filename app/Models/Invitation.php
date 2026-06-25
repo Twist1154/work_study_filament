@@ -46,7 +46,6 @@ class Invitation extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'invitation_id' => 'integer',
             'job_category_id' => 'integer',
             'department_id' => 'integer',

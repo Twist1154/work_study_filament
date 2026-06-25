@@ -17,6 +17,8 @@ class WorkstudyTerm extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'terms_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -43,7 +45,6 @@ class WorkstudyTerm extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'terms_id' => 'integer',
             'student_id' => 'integer',
             'supervisor_id' => 'integer',

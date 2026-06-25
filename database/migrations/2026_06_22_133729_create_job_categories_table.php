@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('job_categories', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('job_category_id')->unique();
+            $table->id('job_category_id');
             $table->string('category_name', 100);
             $table->integer('max_hours_per_month');
             $table->string('description')->nullable();

@@ -17,6 +17,8 @@ class Qualification extends Model
      */
     public $timestamps = false;
 
+    protected $primaryKey = 'qualification_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -37,7 +39,6 @@ class Qualification extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
             'qualification_id' => 'integer',
             'student_id' => 'integer',
         ];

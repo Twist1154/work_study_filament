@@ -17,6 +17,9 @@ class BankDetail extends Model
      */
     public $timestamps = false;
 
+    // FIXED: Explicitly set the primary key to bank_detail_id [1.1.2]
+    protected $primaryKey = 'bank_detail_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -44,7 +47,7 @@ class BankDetail extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
+            // FIXED: Removed redundant id cast
             'bank_detail_id' => 'integer',
             'student_id' => 'integer',
             'valid_from' => 'date',

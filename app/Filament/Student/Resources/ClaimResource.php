@@ -1,68 +1,84 @@
 <?php
 
-namespace App\Filament\Student\Resources\Claims;
+namespace App\Filament\Student\Resources;
 
-use App\Filament\Student\Resources\Claims\Pages\CreateClaim;
-use App\Filament\Student\Resources\Claims\Pages\EditClaim;
-use App\Filament\Student\Resources\Claims\Pages\ListClaims;
-use App\Filament\Student\Resources\Claims\Schemas\ClaimForm;
-use App\Filament\Student\Resources\Claims\Tables\ClaimsTable;
+use App\Filament\Student\Resources\ClaimResource\Pages;
 use App\Models\Claim;
-use BackedEnum;
+use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ClaimResource extends Resource
 {
     protected static ?string $model = Claim::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-document-currency-dollar';
 
-    protected static ?string $recordTitleAttribute = 'Claims';
+    protected static ?string $navigationLabel = 'My Claims';
 
-    public static function form(Schema $schema): Schema
+    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
         return $schema
             ->components([
-                // Filament 5 form schema definition...
-
-                // You can hide the student_id field completely and set it in the creation hook,
-                // or pass it as a hidden field with a default value:
-                \Filament\Forms\Components\Hidden::make('student_id')
+                Forms\Components\Hidden::make('student_id')
                     ->default(fn () => auth()->user()->student?->student_id),
 
-                // Collect other fields safely:
-                \Filament\Forms\Components\Select::make('claim_month')
+                Forms\Components\Select::make('claim_month')
                     ->options(array_combine(range(1, 12), array_map(fn($m) => date('F', mktime(0,0,0,$m,10)), range(1, 12))))
                     ->required(),
 
-                \Filament\Forms\Components\TextInput::make('hours_worked')
+                Forms\Components\TextInput::make('hours_worked')
                     ->numeric()
                     ->required(),
-            ])
-            ->statePath('data');
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return ClaimsTable::configure($table);
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('claim_year')
+                    ->label('Year')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('claim_month')
+                    ->label('Month')
+                    ->formatStateUsing(fn(int $state): string => date('F', mktime(0, 0, 0, $state, 10)))
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('hours_worked')
+                    ->label('Hours Worked')
+                    ->numeric(2),
+
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'submitted' => 'gray',
+                        'supervisor_approved' => 'info',
+                        'coordinator_approved' => 'warning',
+                        'paid' => 'success',
+                        default => 'danger',
+                    }),
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
-    public static function getRelations(): array
+    public static function getEloquentQuery(): Builder
     {
-        return [
-            //
-        ];
+        $student = auth()->user()->student;
+
+        return parent::getEloquentQuery()
+            ->where('student_id', $student ? $student->student_id : 0);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListClaims::route('/'),
-            'create' => CreateClaim::route('/create'),
-            'edit' => EditClaim::route('/{record}/edit'),
+            'index' => Pages\ListClaims::route('/'),
+            'create' => Pages\CreateClaim::route('/create'),
+            'edit' => Pages\EditClaim::route('/{record}/edit'),
         ];
     }
 }

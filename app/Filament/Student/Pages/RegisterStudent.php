@@ -10,6 +10,7 @@ use App\Models\BankDetail;
 use App\Models\WorkstudyTerm;
 use App\Models\TaxDeclaration;
 use App\Models\Document;
+use App\Models\Registration; // ADDED: Import Registration Model
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -28,12 +29,12 @@ use Filament\Pages\Page;
 use Filament\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\DB;
-use Livewire\WithFileUploads; // FIXED: Imported Livewire File Uploads trait [1.1.2]
+use Livewire\WithFileUploads;
 
 class RegisterStudent extends Page implements HasForms
 {
     use InteractsWithForms;
-    use WithFileUploads; // FIXED: Used File Uploads trait inside the class [1.1.2]
+    use WithFileUploads;
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
@@ -46,28 +47,61 @@ class RegisterStudent extends Page implements HasForms
      */
     public array $data = [];
 
-    // FIXED: Consolidated the duplicate mount() methods here
+    /**
+     * Holds any active rejection comments left by staff.
+     */
+    public ?array $rejectionFeedback = null;
+
     public function mount(): void
     {
-        // If the authenticated user already has a student profile,
-        // redirect them to their main dashboard immediately.
-        if (auth()->user()->student()->exists()) {
+        $student = auth()->user()->student;
+
+        if ($student) {
+            $registration = Registration::where('student_id', $student->student_id)->first();
+
+            // 1. If already approved or pending staff sign-off, redirect away [1.2.3]
+            if ($registration && in_array($registration->status, ['approved', 'pending_hod_approval', 'pending_final'])) {
             $this->redirect('/student');
             return;
+        }
+
+            // 2. Load active correction comments if the registration is rejected [1.2.3]
+            if ($registration && $registration->status === 'rejected') {
+                $this->rejectionFeedback = $registration->verification_status ?? [];
+            }
         }
 
         $this->form->fill();
     }
 
+    /**
+     * Orchestrates the 5-step form wizard cleanly using modular steps [1.1.2, 1.2.3].
+     */
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Wizard::make([
-                    // ==========================================
-                    // STEP 1: APPOINTMENT & BIOGRAPHICAL DETAILS
-                    // ==========================================
-                    Step::make('Biographical Details')
+                    $this->getBiographicalStep(),
+                    $this->getBankStep(),
+                    $this->getUploadsStep(),
+                    $this->getTermsStep(),
+                    $this->getTaxStep(),
+                ])
+                ->submitAction(new HtmlString(
+                    '<button type="submit" class="fi-btn fi-btn-color-primary fi-size-md relative inline-grid grid-flow-col items-center justify-center gap-1.5 rounded-lg border font-semibold outline-none transition duration-75 focus-visible:ring-2 shadow-sm px-3.5 py-2 text-sm bg-primary-600 text-white hover:bg-primary-500 border-transparent dark:bg-primary-500 dark:hover:bg-primary-400">Submit Registration</button>'
+                ))
+            ])
+            ->statePath('data');
+    }
+
+    // ==========================================================
+    // MODULAR WIZARD COMPONENTS (Extracted for readability) [1.1.2]
+    // ==========================================================
+
+    protected function getBiographicalStep(): Step
+    {
+        return Step::make('Biographical Details')
                         ->schema([
                             Section::make('Appointment Details')
                                 ->columns(2)
@@ -204,12 +238,12 @@ class RegisterStudent extends Page implements HasForms
                                         ->tel()
                                         ->required(),
                                 ]),
-                        ]),
+            ]);
+    }
 
-                    // ==========================================
-                    // STEP 2: BANK DETAIL INFORMATION
-                    // ==========================================
-                    Step::make('Bank Details')
+    protected function getBankStep(): Step
+    {
+        return Step::make('Bank Details')
                         ->schema([
                             // Section A: Employee Details (Display Reactive Previews from Step 1)
                             Section::make('Section A - Employee Details')
@@ -300,12 +334,12 @@ class RegisterStudent extends Page implements HasForms
                                         ->label('I certify that the banking details provided above are correct.')
                                         ->required(),
                                 ]),
-                        ]),
+            ]);
+    }
 
-                    // ==========================================
-                    // STEP 3: SUPPORTING DOCUMENTS (UPLOAD)
-                    // ==========================================
-                    Step::make('Uploads')
+    protected function getUploadsStep(): Step
+    {
+        return Step::make('Uploads')
                         ->schema([
                             Section::make('Supporting Documents Checklist')
                                 ->description('Ensure your uploaded documents are certified where necessary.')
@@ -341,12 +375,12 @@ class RegisterStudent extends Page implements HasForms
                                         ->visible(fn (callable $get): bool => (bool) $get('is_foreign_student'))
                                         ->required(fn (callable $get): bool => (bool) $get('is_foreign_student')),
                                 ]),
-                        ]),
+            ]);
+    }
 
-                    // ==========================================
-                    // STEP 4: TERMS & CONDITIONS
-                    // ==========================================
-                    Step::make('Terms & Conditions')
+    protected function getTermsStep(): Step
+    {
+        return Step::make('Terms & Conditions')
                         ->schema([
                             Section::make('Program regulations')
                                 ->description('Please review and acknowledge the Terms and Conditions')
@@ -390,12 +424,12 @@ class RegisterStudent extends Page implements HasForms
                                         ->required()
                                         ->columnSpanFull(),
                                 ]),
-                        ]),
+            ]);
+    }
 
-                    // ==========================================
-                    // STEP 5: TAX DECLARATION
-                    // ==========================================
-                    Step::make('Tax Declaration')
+    protected function getTaxStep(): Step
+    {
+        return Step::make('Tax Declaration')
                         ->schema([
                             Section::make('Declaration')
                                 ->schema([
@@ -426,27 +460,24 @@ class RegisterStudent extends Page implements HasForms
                                         ->default(now())
                                         ->required(),
                                 ]),
-                        ]),
-                ])
-                ->submitAction(new HtmlString(
-                    '<button type="submit" class="fi-btn fi-btn-color-primary fi-size-md relative inline-grid grid-flow-col items-center justify-center gap-1.5 rounded-lg border font-semibold outline-none transition duration-75 focus-visible:ring-2 shadow-sm px-3.5 py-2 text-sm bg-primary-600 text-white hover:bg-primary-500 border-transparent dark:bg-primary-500 dark:hover:bg-primary-400">Submit Registration</button>'
-                ))
-            ])
-            ->statePath('data');
+            ]);
     }
 
+    /**
+     * Executes database transactions to save onboarding metrics [1.1.2, 1.2.3].
+     */
     public function create(): void
     {
-        // Enforces full validation checks on current steps
         $formData = $this->form->getState();
 
         DB::transaction(function () use ($formData) {
             $userId = auth()->id();
 
-            // 1. Save Student model
-            $student = Student::create([
-                'user_id' => $userId,
-                'student_number' => $formData['student_number'] ?? null,
+            // 1. Create or Update Student record [1.1.2]
+            $student = Student::updateOrCreate(
+                ['user_id' => $userId],
+                [
+                    'student_number' => $formData['student_number'],
                 'surname' => $formData['surname'],
                 'first_names' => $formData['first_names'],
                 'gender' => $formData['gender'],
@@ -456,119 +487,102 @@ class RegisterStudent extends Page implements HasForms
                 'is_foreign_student' => (bool) ($formData['is_foreign_student'] ?? false),
                 'work_permit_number' => $formData['is_foreign_student'] ? ($formData['work_permit_number'] ?? null) : null,
                 'work_permit_expiry' => $formData['is_foreign_student'] ? ($formData['work_permit_expiry'] ?? null) : null,
-
-                // Inherited system parameters defaults
                 'fee_account_outstanding' => true,
                 'nsfas_funded' => false,
                 'full_bursary_holder' => false,
                 'bursary_settled_before_sem2' => false,
-            ]);
+                ]
+            );
 
-            // 2. Save Home Address
-            Address::create([
-                'student_id' => $student->student_id,
+            // 2. Save Home Address [1.1.2]
+            Address::updateOrCreate(
+                ['student_id' => $student->student_id, 'street_name' => $formData['home_street_name']],
+                [
                 'street_number' => (int) $formData['home_street_number'],
-                'street_name' => $formData['home_street_name'],
                 'suburb' => $formData['home_suburb'],
                 'city' => $formData['home_city'],
                 'post_code' => $formData['home_post_code'],
-            ]);
+                ]
+            );
 
-            // 3. Save Current Address
-            Address::create([
-                'student_id' => $student->student_id,
+            // 3. Save Current Address [1.1.2]
+            Address::updateOrCreate(
+                ['student_id' => $student->student_id, 'street_name' => $formData['current_street_name']],
+                [
                 'street_number' => (int) $formData['current_street_number'],
-                'street_name' => $formData['current_street_name'],
                 'suburb' => $formData['current_suburb'],
                 'city' => $formData['current_city'],
                 'post_code' => $formData['current_post_code'],
-            ]);
+                ]
+            );
 
-            // 4. Save Banking Details
-            BankDetail::create([
-                'student_id' => $student->student_id,
+            // 4. Save Banking Details [1.1.2]
+            BankDetail::updateOrCreate(
+                ['student_id' => $student->student_id],
+                [
                 'account_type' => $formData['account_type'],
                 'account_number' => $formData['account_number'],
                 'bank_name' => $formData['bank_name'],
                 'branch_name' => $formData['branch_name'] ?? null,
                 'branch_code' => $formData['branch_code'] ?? null,
                 'ownership_type' => $formData['ownership_type'],
-                'third_party_name' => in_array($formData['ownership_type'], ['joint', 'third_party']) ? ($formData['third_party_name'] ?? null) : null,
-                'third_party_relationship' => in_array($formData['ownership_type'], ['joint', 'third_party']) ? ($formData['third_party_relationship'] ?? null) : null,
+                    'third_party_name' => $formData['third_party_name'] ?? null,
+                    'third_party_relationship' => $formData['third_party_relationship'] ?? null,
                 'valid_from' => now()->toDateString(),
-            ]);
+                ]
+            );
 
-            // 5. Save Terms Agreement
-            WorkstudyTerm::create([
-                'student_id' => $student->student_id,
+            // 5. Save Terms Agreement [1.1.2]
+            WorkstudyTerm::updateOrCreate(
+                ['student_id' => $student->student_id],
+                [
                 'student_signature_file' => $formData['student_signature_file'],
                 'student_signed_date' => $formData['terms_signed_date'],
                 'student_signed_place' => $formData['terms_signed_place'],
                 'terms_accepted' => (bool) $formData['terms_accepted'],
-            ]);
+                ]
+            );
 
-            // 6. Save Tax Declaration
-            TaxDeclaration::create([
-                'student_id' => $student->student_id,
+            // 6. Save Tax Declaration [1.1.2]
+            TaxDeclaration::updateOrCreate(
+                ['student_id' => $student->student_id],
+                [
                 'works_less_than_22hrs' => (bool) $formData['works_less_than_22hrs'],
                 'no_other_employer' => (bool) $formData['no_other_employer'],
                 'declaration_text' => $formData['declaration_text'] ?? null,
                 'signed_place' => $formData['tax_signed_place'],
                 'declaration_date' => $formData['tax_signed_date'],
                 'tax_rate_applied' => 0.0,
-            ]);
+                ]
+            );
 
-            // 7. Save Supporting Uploads into the "documents" table
-            // ID / Passport
-            if (!empty($formData['id_copy'])) {
-                Document::create([
-                    'student_id' => $student->student_id,
-                    'document_type' => 'ID Copy',
-                    'file_path' => $formData['id_copy'],
-                    'uploaded_at' => now(),
-                ]);
+            // 7. Save Supporting Uploads into the "documents" table [1.1.2]
+            $documents = [
+                'id_copy' => 'ID Copy',
+                'proof_of_registration' => 'Proof of Registration',
+                'bank_account_proof' => 'Other',
+                'tax_certificate' => 'SARS Tax Certificate',
+                'permit_copy' => 'Study Permit'
+            ];
+
+            foreach ($documents as $field => $type) {
+                if (!empty($formData[$field])) {
+                    Document::updateOrCreate(
+                        ['student_id' => $student->student_id, 'document_type' => $type],
+                        ['file_path' => $formData[$field], 'uploaded_at' => now()]
+                    );
+            }
             }
 
-            // Proof of Student Registration
-            if (!empty($formData['proof_of_registration'])) {
-                Document::create([
-                    'student_id' => $student->student_id,
-                    'document_type' => 'Proof of Registration',
-                    'file_path' => $formData['proof_of_registration'],
-                    'uploaded_at' => now(),
-                ]);
-            }
-
-            // Proof of Bank Account (Saved as 'Other' to align with enum)
-            if (!empty($formData['bank_account_proof'])) {
-                Document::create([
-                    'student_id' => $student->student_id,
-                    'document_type' => 'Other',
-                    'file_path' => $formData['bank_account_proof'],
-                    'uploaded_at' => now(),
-                ]);
-            }
-
-            // Tax Number Confirmation
-            if (!empty($formData['tax_certificate'])) {
-                Document::create([
-                    'student_id' => $student->student_id,
-                    'document_type' => 'SARS Tax Certificate',
-                    'file_path' => $formData['tax_certificate'],
-                    'uploaded_at' => now(),
-                ]);
-            }
-
-            // Study Permit / Visa
-            if ($formData['is_foreign_student'] && !empty($formData['permit_copy'])) {
-                Document::create([
-                    'student_id' => $student->student_id,
-                    'document_type' => 'Study Permit',
-                    'file_path' => $formData['permit_copy'],
-                    'permit_expiry_date' => $formData['work_permit_expiry'] ?? null,
-                    'uploaded_at' => now(),
-                ]);
-            }
+            // 8. Create or Reset Registration row to trigger staff verification queue [1.1.2, 1.2.3]
+            Registration::updateOrCreate(
+                ['student_id' => $student->student_id],
+                [
+                    'status' => 'pending_verification',
+                    'verification_status' => null, // Resets old rejection reasons
+                    'conditions_accepted' => (bool) $formData['terms_accepted'],
+                ]
+            );
         });
 
         Notification::make()

@@ -17,6 +17,11 @@ class Registration extends Model
      */
     public $timestamps = false;
 
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
     protected $primaryKey = 'registration_id';
 
     /**
@@ -37,6 +42,7 @@ class Registration extends Model
         'hod_signature_date',
         'hod_signature_place',
         'claims_sheet_pdf_path',
+        'verification_status', // FIXED: Added to allow saving verification comments [1.1.2]
     ];
 
     /**
@@ -56,9 +62,9 @@ class Registration extends Model
             'final_approver_id' => 'integer',
             'hod_signature_date' => 'date',
             'created_at' => 'datetime',
+            'verification_status' => 'array', // FIXED: Safely casts JSON to PHP array [1.1.2]
         ];
     }
-
 
     public function invitation(): BelongsTo
     {

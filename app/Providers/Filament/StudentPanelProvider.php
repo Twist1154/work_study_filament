@@ -30,7 +30,7 @@ class StudentPanelProvider extends PanelProvider
             ->colors([
                 // FIXED: Replaced invalid constant with hex code helper (e.g. CPUT Brand Blue)
                 'primary' => Color::hex('#005C8A'),
-                'gray' => Color::Slate,
+                //'gray' => Color::Slate,
             ])
             ->discoverResources(in: app_path('Filament/Student/Resources'), for: 'App\Filament\Student\Resources')
             ->discoverPages(in: app_path('Filament/Student/Pages'), for: 'App\Filament\Student\Pages')

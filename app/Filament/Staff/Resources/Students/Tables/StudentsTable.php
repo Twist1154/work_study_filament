@@ -28,20 +28,20 @@ class StudentsTable
                     ->searchable(),
                 TextColumn::make('gender')
                     ->searchable(),
-                TextColumn::make('date_of_birth')
+                /* TextColumn::make('date_of_birth')
                     ->date()
                     ->sortable(),
                 TextColumn::make('id_passport_number')
                     ->searchable(),
-                TextColumn::make('sars_tax_number')
-                    ->searchable(),
+               TextColumn::make('sars_tax_number')
+                    ->searchable(),*/
                 IconColumn::make('is_foreign_student')
                     ->boolean(),
-                TextColumn::make('work_permit_number')
+                /*TextColumn::make('work_permit_number')
                     ->searchable(),
                 TextColumn::make('work_permit_expiry')
                     ->date()
-                    ->sortable(),
+                    ->sortable(),*/
                 IconColumn::make('fee_account_outstanding')
                     ->boolean(),
                 IconColumn::make('nsfas_funded')

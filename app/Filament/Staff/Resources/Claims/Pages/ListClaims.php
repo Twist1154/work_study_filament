@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Student\Resources\ClaimResource\Pages;
+namespace App\Filament\Staff\Resources\Claims\Pages;
 
-use App\Filament\Student\Resources\ClaimResource;
-use Filament\Actions;
+use App\Filament\Staff\Resources\Claims\ClaimResource;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListClaims extends ListRecords
@@ -13,7 +13,7 @@ class ListClaims extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

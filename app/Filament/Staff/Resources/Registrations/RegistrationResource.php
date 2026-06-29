@@ -10,18 +10,19 @@ use App\Models\StaffMember;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Filament\Staff\Resources\Registrations\Pages; // FIXED: Added correct Pages namespace [1.1.2]
+use App\Filament\Staff\Resources\Registrations\Pages\ListRegistrations;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
 
 class RegistrationResource extends Resource
 {
@@ -67,7 +68,7 @@ class RegistrationResource extends Resource
             ])
             ->actions([
                 // 1. Opens the Schema-based detailed onboarding package viewer [1.1.2]
-                Tables\Actions\ViewAction::make()
+                ViewAction::make()
                     ->modalHeading('Review Student Onboarding Package')
                     ->modalWidth('5xl'),
 
@@ -245,7 +246,7 @@ class RegistrationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages::ListRegistrations::route('/'),
+            'index' => ListRegistrations::route('/'),
         ];
     }
 }

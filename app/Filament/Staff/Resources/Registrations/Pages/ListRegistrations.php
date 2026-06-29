@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Staff\Resources\Registrations\Pages;
 
-use App\Filament\Staff\Resources\RegistrationResource;
+use App\Filament\Staff\Resources\Registrations\RegistrationResource;
 use App\Models\Registration;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListRegistrations extends ListRecords
@@ -15,18 +15,16 @@ class ListRegistrations extends ListRecords
     protected static string $resource = RegistrationResource::class;
 
     /**
-     * ADDED: Dynamic navigation filter tabs for the onboarding queues [1.1.2, 1.2.3]
-     *
      * @return array<string, Tab>
      */
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('All in Progress'),
+            'all' => Tab::make('All Onboarding'),
 
-            'pending_verification' => Tab::make('Pending Verification')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('status', ['pending_student', 'pending_verification']))
-                ->badge(Registration::whereIn('status', ['pending_student', 'pending_verification'])->count())
+            'pending' => Tab::make('Pending Verification')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'pending_verification'))
+                ->badge(Registration::where('status', 'pending_verification')->count())
                 ->badgeColor('gray'),
 
             'pending_hod' => Tab::make('HOD Sign-Off')

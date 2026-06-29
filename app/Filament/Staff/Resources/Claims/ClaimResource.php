@@ -9,17 +9,17 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
 use Illuminate\Support\Collection;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Illuminate\Support\Facades\Storage;
-use App\Filament\Staff\Resources\Claims\Pages;
+use App\Filament\Staff\Resources\Claims\Pages\ListClaims;
 
 class ClaimResource extends Resource
 {
     protected static ?string $model = Claim::class;
 
-    protected static string|BackedEnum|null  $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-dollar';
 
     protected static ?string $navigationLabel = 'Workstudy Claims';
 
@@ -117,7 +117,8 @@ class ClaimResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages::ListClaims::route('/'),
+            // FIXED: Removed Pages:: to reference the directly imported class [1.1.2]
+            'index' => ListClaims::route('/'),
         ];
     }
 }

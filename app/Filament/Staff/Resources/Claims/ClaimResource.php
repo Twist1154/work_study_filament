@@ -62,6 +62,49 @@ class ClaimResource extends Resource
                     ->formatStateUsing(fn (string $state): string => str_replace('_', ' ', ucfirst($state))),
             ])
             ->actions([
+                // ADDED: Generates and downloads the CPUT timesheet PDF report [1.1.2]
+                Action::make('download_timesheet')
+                    ->label('Download PDF Timesheet')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('success')
+                    ->action(function (Claim $record) {
+                        $student = $record->student;
+
+                        // 1. Fetch daily logs for the specific month/year
+                        $logs = \App\Models\WorkLog::where('student_id', $record->student_id)
+                            ->where('appointment_id', $record->appointment_id)
+                            ->whereMonth('clock_in_at', $record->claim_month)
+                            ->whereYear('clock_in_at', $record->claim_year)
+                            ->orderBy('clock_in_at', 'asc')
+                            ->get();
+
+                        // 2. Distribute logs into Weeks 1-5 [1.1.2]
+                        $weeks = [1 => [], 2 => [], 3 => [], 4 => [], 5 => []];
+                        foreach ($logs as $log) {
+                            $day = $log->clock_in_at->day;
+                            if ($day <= 7) $weeks[1][] = $log;
+                            elseif ($day <= 14) $weeks[2][] = $log;
+                            elseif ($day <= 21) $weeks[3][] = $log;
+                            elseif ($day <= 28) $weeks[4][] = $log;
+                            else $weeks[5][] = $log;
+                        }
+
+                        $rate = $record->appointment->remuneration_rate_per_hour ?? 50.00;
+
+                        // 3. Compile the PDF View [1.1.2]
+                        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.timesheet', [
+                            'claim' => $record,
+                            'student' => $student,
+                            'weeks' => $weeks,
+                            'rate' => $rate,
+                        ]);
+
+                        // 4. Download file [1.1.2]
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, 'CPUT-Timesheet-' . $student->student_number . '-' . $record->claim_month . '-' . $record->claim_year . '.pdf');
+                    }),
+
                 Action::make('supervisorApprove')
                     ->label('Supervisor Approve')
                     ->visible(fn ($record) => $record->status === 'submitted')
@@ -117,7 +160,6 @@ class ClaimResource extends Resource
     public static function getPages(): array
     {
         return [
-            // FIXED: Removed Pages:: to reference the directly imported class [1.1.2]
             'index' => ListClaims::route('/'),
         ];
     }

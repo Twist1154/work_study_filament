@@ -36,6 +36,7 @@ class Invitation extends Model
         'cost_centre',
         'expires_at',
         'status',
+        'opened_at', // Added to track when the email link is opened
     ];
 
     /**
@@ -52,9 +53,9 @@ class Invitation extends Model
             'campus_id' => 'integer',
             'supervisor_id' => 'integer',
             'expires_at' => 'datetime',
+            'opened_at' => 'datetime', // Added datetime cast
         ];
     }
-
 
     public function jobCategory(): BelongsTo
     {

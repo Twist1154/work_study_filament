@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('cost_centre', 20)->default('Y269');
             $table->dateTime('expires_at');
             $table->enum('status', ['sent', 'expired', 'accepted', 'cancelled'])->default('sent');
+            $table->timestamp('opened_at')->nullable(); // Added tracking column
         });
 
         Schema::enableForeignKeyConstraints();

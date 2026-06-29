@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Staff\Resources\Registrations\Pages;
 
 use App\Filament\Staff\Resources\Registrations\RegistrationResource;
+use App\Filament\Staff\Resources\Registrations\Widgets\RegistrationStats; // Import the widget
 use App\Models\Registration;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -41,6 +42,16 @@ class ListRegistrations extends ListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'rejected'))
                 ->badge(Registration::where('status', 'rejected')->count())
                 ->badgeColor('danger'),
+        ];
+    }
+
+    /**
+     * Register header widgets for the list view
+     */
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            RegistrationStats::class,
         ];
     }
 }

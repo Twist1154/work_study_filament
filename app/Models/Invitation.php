@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Mail\StudentInvitationMail; // ADDED: Import the Invitation Mail
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Mail; // ADDED: Import Mail facade
 
 class Invitation extends Model
 {
@@ -27,6 +29,7 @@ class Invitation extends Model
     protected $fillable = [
         'invitation_id',
         'invitation_token',
+        'email', // ADDED: Mass-assignable student email
         'job_category_id',
         'department_id',
         'campus_id',
@@ -36,7 +39,7 @@ class Invitation extends Model
         'cost_centre',
         'expires_at',
         'status',
-        'opened_at', // Added to track when the email link is opened
+        'opened_at',
     ];
 
     /**
@@ -53,8 +56,26 @@ class Invitation extends Model
             'campus_id' => 'integer',
             'supervisor_id' => 'integer',
             'expires_at' => 'datetime',
-            'opened_at' => 'datetime', // Added datetime cast
+            'opened_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Bootstrap the model and its event hooks.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Invitation $invitation) {
+            // Generate a secure 64-character token [1]
+            $invitation->invitation_token = bin2hex(random_bytes(32));
+            $invitation->expires_at = now()->addHours(48);
+            $invitation->status = 'sent';
+        });
+
+        static::created(function (Invitation $invitation) {
+            // Automatically send the activation mail upon database creation [1]
+            Mail::to($invitation->email)->send(new StudentInvitationMail($invitation));
+        });
     }
 
     public function jobCategory(): BelongsTo
